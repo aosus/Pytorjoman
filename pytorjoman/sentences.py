@@ -85,14 +85,13 @@ class Sentence(Model):
                 raise UnknownError()
 
     async def update(self, new_sentence: str):
-        status, res = await _call(
-            f'{self.base_url}/api/v1/sentences/update',
+        status, res = await self._call(
+            "update",
             "PUT",
             data={
                 "id": self.id,
                 "new_sentence": new_sentence
-            },
-            token=self._access_token
+            }
         )
         match status:
             case 200:

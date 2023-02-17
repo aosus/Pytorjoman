@@ -78,14 +78,13 @@ class Section(Model):
                 raise UnknownError()
 
     async def update(self, new_name: str):
-        status, res = await _call(
-            f'{self.base_url}/api/v1/sections/update',
+        status, res = await self._call(
+            'update',
             "PUT",
             data={
                 "id": self.id,
                 "new_name": new_name
-            },
-            token=self._access_token
+            }
         )
         match status:
             case 200:

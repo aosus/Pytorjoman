@@ -32,14 +32,15 @@ class Model:
     _access_token: str
     
     async def _call(
-        self, path: str, method: str = "POST", data: dict = {}, with_auth: bool = True
+        self, path: str, method: str = "POST", data: dict = {}, params: dict = {}, with_auth: bool = True
     ) -> tuple[int, dict]:
         return await _call(
             f'{self.base_url}/api/v1/{self.controller}/{path}',
             method,
             data,
+            params,
             with_auth,
-            token=self._access_token
+            self._access_token
         )
 
 @dataclass
