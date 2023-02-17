@@ -20,7 +20,7 @@ class Project(Model):
     @staticmethod
     async def list_project(base_url: str, token: str, user: str = None, page: int = 1, page_size: int = 25):
         status, res = await _call(
-            f'{base_url}/api/projects/',
+            f'{base_url}/api/v1/projects/',
             "GET",
             params={
                 "username": user,
@@ -63,7 +63,7 @@ class Project(Model):
     @staticmethod
     async def create_project(base_url: str, token: str, name: str):
         status, res = await _call(
-            f'{base_url}/api/projects/',
+            f'{base_url}/api/v1/projects/',
             data={
                 "name": name
             },
@@ -94,7 +94,7 @@ class Project(Model):
 
     async def update(self, new_name: str):
         status, res = await _call(
-            f'{self.base_url}/api/projects/update',
+            f'{self.base_url}/api/v1/projects/update',
             data={
                 "id": self.id,
                 "new_name": new_name

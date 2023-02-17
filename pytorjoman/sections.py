@@ -21,7 +21,7 @@ class Section(Model):
     @staticmethod
     async def list_sections(base_url: str, token: str, project: Project):
         status, res = await _call(
-            f'{base_url}/api/sections/',
+            f'{base_url}/api/v1/sections/',
             "GET",
             params={
                 "project": project.id,
@@ -54,7 +54,7 @@ class Section(Model):
     @staticmethod
     async def create_section(base_url: str, token: str, project: Project, name: str):
         status, res = await _call(
-            f'{base_url}/api/sections/',
+            f'{base_url}/api/v1/sections/',
             data={
                 "name": name,
                 "project": project.id,
@@ -85,7 +85,7 @@ class Section(Model):
 
     async def update(self, new_name: str):
         status, res = await _call(
-            f'{self.base_url}/api/sections/update',
+            f'{self.base_url}/api/v1/sections/update',
             data={
                 "id": self.id,
                 "new_name": new_name

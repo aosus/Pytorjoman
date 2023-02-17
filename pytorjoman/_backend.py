@@ -33,7 +33,7 @@ class Model:
         self, path: str, method: str = "POST", data: dict = {}, with_auth: bool = True
     ) -> tuple[int, dict]:
         return await _call(
-            f'{self.base_url}/api/{self.controller}/{path}',
+            f'{self.base_url}/api/v1/{self.controller}/{path}',
             method,
             data,
             with_auth,

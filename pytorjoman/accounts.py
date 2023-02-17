@@ -82,7 +82,7 @@ class Account(Model):
     @staticmethod
     async def signup(base_url: str, first_name: str, last_name: str, email: str, username: str, password: str, send_time: time, number_of_words: int):
         status, res = await _call(
-            f'{base_url}/api/accounts/',
+            f'{base_url}/api/v1/accounts/',
             data={
                 'frist_name': first_name,
                 'last_name': last_name,
@@ -119,7 +119,7 @@ class Account(Model):
     @staticmethod
     async def login(base_url: str, username: str, password: str):
         status, res = await _call(
-            f'{base_url}/api/accounts/login',
+            f'{base_url}/api/v1/accounts/login',
             data={
                 'username': username,
                 'password': password
