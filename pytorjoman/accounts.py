@@ -24,7 +24,7 @@ class Account(Model):
             data['send_time'] = send_time
         if number_of_words:
             data['number_of_words'] = number_of_words
-        status, res = await self._call('update', data=data)
+        status, res = await self._call('update', "PUT", data=data)
         match status:
             case 200:
                 self.id = res['id']

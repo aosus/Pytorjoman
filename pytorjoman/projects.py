@@ -95,6 +95,7 @@ class Project(Model):
     async def update(self, new_name: str):
         status, res = await _call(
             f'{self.base_url}/api/v1/projects/update',
+            "PUT",
             data={
                 "id": self.id,
                 "new_name": new_name

@@ -45,7 +45,7 @@ class Section(Model):
             case 404:
                 raise NotFoundError()
             case 422:
-                raise ValueError("Incorrect value, please check username, page and page_size")
+                raise ValueError("Incorrect value, please check project")
             case 401:
                 raise TokenExpiredError()
             case _:
@@ -86,6 +86,7 @@ class Section(Model):
     async def update(self, new_name: str):
         status, res = await _call(
             f'{self.base_url}/api/v1/sections/update',
+            "PUT",
             data={
                 "id": self.id,
                 "new_name": new_name

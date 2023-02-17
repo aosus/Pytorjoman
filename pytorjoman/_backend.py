@@ -11,7 +11,7 @@ async def _call(
         if with_auth
         else None,
     }
-    if method == "POST":
+    if method in ["POST", "PUT"]:
         base["json"] = data
     if params:
         base['params'] = params
@@ -19,6 +19,8 @@ async def _call(
         match method:
             case "POST":
                 res = await client.post(**base)
+            case "PUT":
+                res = await client.put(**base)
             case "GET":
                 res = await client.get(**base)
         return res.status_code, res.json()
