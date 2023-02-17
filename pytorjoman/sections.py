@@ -6,12 +6,6 @@ from pytorjoman.errors import AlreadyExistError, NotAllowedError, NotFoundError,
 from pytorjoman.projects import Project
 
 @dataclass
-class Owner:
-    id: int
-    first_name: str
-
-
-@dataclass
 class Section(Model):
     id: int
     project: Project
@@ -57,7 +51,7 @@ class Section(Model):
             f'{base_url}/api/v1/sections/',
             data={
                 "name": name,
-                "project": project.id,
+                "project_id": project.id,
             },
             token=token
         )
