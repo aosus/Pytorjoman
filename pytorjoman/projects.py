@@ -1,8 +1,14 @@
 from dataclasses import dataclass
 from datetime import datetime, time
 from urllib import parse
-from pytorjoman._backend import Model, _call, ModelList
-from pytorjoman.errors import AlreadyExistError, NotAllowedError, NotFoundError, IncorrectPasswordError, TokenExpiredError, UnknownError, UnloggedInError
+
+import pytorjoman
+from pytorjoman._backend import Model, ModelList, _call
+from pytorjoman.errors import (AlreadyExistError, IncorrectPasswordError,
+                               NotAllowedError, NotFoundError,
+                               TokenExpiredError, UnknownError,
+                               UnloggedInError)
+
 
 @dataclass
 class Owner:
@@ -114,3 +120,16 @@ class Project(Model):
                 raise ValueError()
             case _:
                 raise UnknownError()
+            
+    
+    async def create_section(self, name):
+        section = await pytorjoman.Section.create_section(self.base_url, self._access_token, self, name)
+        return section
+    
+    async def list_sections(self):
+        sections = await pytorjoman.Section.list_sections(
+            self.base_url,
+            self._access_token,
+            self
+        )
+        return sections

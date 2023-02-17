@@ -1,19 +1,23 @@
 from dataclasses import dataclass
 from datetime import datetime, time
 from urllib import parse
-from pytorjoman._backend import Model, _call, ModelList
-from pytorjoman.errors import AlreadyExistError, NotAllowedError, NotFoundError, IncorrectPasswordError, TokenExpiredError, UnknownError, UnloggedInError
-from pytorjoman.projects import Project
+import pytorjoman
+from pytorjoman._backend import Model, ModelList, _call
+from pytorjoman.errors import (AlreadyExistError, IncorrectPasswordError,
+                               NotAllowedError, NotFoundError,
+                               TokenExpiredError, UnknownError,
+                               UnloggedInError)
+
 
 @dataclass
 class Section(Model):
     id: int
-    project: Project
+    project: pytorjoman.Project
     name: str
     created_at: datetime
     
     @staticmethod
-    async def list_sections(base_url: str, token: str, project: Project):
+    async def list_sections(base_url: str, token: str, project: pytorjoman.Project):
         status, res = await _call(
             f'{base_url}/api/v1/sections/',
             "GET",
@@ -46,7 +50,7 @@ class Section(Model):
                 raise UnknownError()
 
     @staticmethod
-    async def create_section(base_url: str, token: str, project: Project, name: str):
+    async def create_section(base_url: str, token: str, project: pytorjoman.Project, name: str):
         status, res = await _call(
             f'{base_url}/api/v1/sections/',
             data={
@@ -99,3 +103,17 @@ class Section(Model):
                 raise ValueError()
             case _:
                 raise UnknownError()
+
+    async def create_sentence(self, sentence):
+        sentence = await pytorjoman.Sentence.create_sentence(self.base_url, self._access_token, self, sentence)
+        return sentence
+    
+    async def list_sentences(self, page: int = 1, page_size = 25):
+        sentences = await pytorjoman.Sentence.list_sentences(
+            self.base_url,
+            self._access_token,
+            self,
+            page,
+            page_size
+        )
+        return sentences

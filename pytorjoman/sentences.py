@@ -1,19 +1,22 @@
 from dataclasses import dataclass
 from datetime import datetime
 from urllib import parse
-from pytorjoman._backend import Model, _call, ModelList
-from pytorjoman.errors import AlreadyExistError, NotAllowedError, NotFoundError, TokenExpiredError, UnknownError, UnloggedInError
-from pytorjoman.sections import Section
+import pytorjoman
+from pytorjoman._backend import Model, ModelList, _call
+from pytorjoman.errors import (AlreadyExistError, NotAllowedError,
+                               NotFoundError, TokenExpiredError, UnknownError,
+                               UnloggedInError)
+
 
 @dataclass
 class Sentence(Model):
     id: int
-    section: Section
+    section: pytorjoman.Section
     sentence: str
     created_at: datetime
     
     @staticmethod
-    async def list_sentences(base_url: str, token: str, section: Section, page: int = 1, page_size: int = 25):
+    async def list_sentences(base_url: str, token: str, section: pytorjoman.Section, page: int = 1, page_size: int = 25):
         status, res = await _call(
             f'{base_url}/api/v1/sentences/',
             "GET",
@@ -53,7 +56,7 @@ class Sentence(Model):
                 raise UnknownError()
 
     @staticmethod
-    async def create_sentence(base_url: str, token: str, section: Section, sentence: str):
+    async def create_sentence(base_url: str, token: str, section: pytorjoman.Section, sentence: str):
         status, res = await _call(
             f'{base_url}/api/v1/sentences/',
             data={
@@ -106,3 +109,17 @@ class Sentence(Model):
                 raise ValueError()
             case _:
                 raise UnknownError()
+    
+    async def create_translation(self, translation):
+        translation = await pytorjoman.Translation.create_translation(self.base_url, self._access_token, self, translation)
+        return translation
+    
+    async def list_translations(self, page: int = 1, page_size = 25):
+        translations = await pytorjoman.Translation.list_translations(
+            self.base_url,
+            self._access_token,
+            self,
+            page,
+            page_size
+        )
+        return translations

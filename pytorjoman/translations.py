@@ -2,23 +2,25 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 from urllib import parse
-from pytorjoman._backend import Model, _call, ModelList
-from pytorjoman.errors import AlreadyExistError, NotAllowedError, NotFoundError, TokenExpiredError, UnknownError, UnloggedInError
+import pytorjoman
+from pytorjoman._backend import Model, ModelList, _call
+from pytorjoman.errors import (AlreadyExistError, NotAllowedError,
+                               NotFoundError, TokenExpiredError, UnknownError,
+                               UnloggedInError)
 from pytorjoman.projects import Owner
-from pytorjoman.sentences import Sentence
 
 @dataclass
 class Translation(Model):
     id: int
     translator: Optional[Owner]
-    sentence: Sentence
+    sentence: pytorjoman.Sentence
     translation: str
     voters: Optional[list[Owner]]
     is_approved: bool
     created_at: datetime
     
     @staticmethod
-    async def list_translations(base_url: str, token: str, sentence: Sentence, page: int = 1, page_size: int = 25):
+    async def list_translations(base_url: str, token: str, sentence: pytorjoman.Sentence, page: int = 1, page_size: int = 25):
         """Get Sentence's translations. 
         
         it doesn't return voters due to API limitations, to get voters please use get_voters function instead
@@ -68,7 +70,7 @@ class Translation(Model):
                 raise UnknownError()
 
     @staticmethod
-    async def create_translation(base_url: str, token: str, sentence: Sentence, translation: str):
+    async def create_translation(base_url: str, token: str, sentence: pytorjoman.Sentence, translation: str):
         status, res = await _call(
             f'{base_url}/api/v1/translations/',
             data={

@@ -1,7 +1,12 @@
 from dataclasses import dataclass
 from datetime import time
+
+import pytorjoman
 from pytorjoman._backend import Model, _call
-from pytorjoman.errors import AlreadyExistError, NotFoundError, IncorrectPasswordError, TokenExpiredError, UnknownError, UnloggedInError
+from pytorjoman.errors import (AlreadyExistError, IncorrectPasswordError,
+                               NotFoundError, TokenExpiredError, UnknownError,
+                               UnloggedInError)
+
 
 @dataclass
 class Account(Model):
@@ -78,6 +83,20 @@ class Account(Model):
                 raise ValueError("password lenght must be between 8 and 50")
             case _:
                 return UnknownError()
+            
+    async def create_project(self, name):
+        project = await pytorjoman.Project.create_project(self.base_url, self._access_token, name)
+        return project
+    
+    async def list_projects(self, page: int = 1, page_size = 25, mine: bool = True):
+        projects = await pytorjoman.Project.list_project(
+            self.base_url,
+            self._access_token,
+            self.username if mine else None,
+            page,
+            page_size
+        )
+        return projects
     
     @staticmethod
     async def signup(base_url: str, first_name: str, last_name: str, email: str, username: str, password: str, send_time: time, number_of_words: int):

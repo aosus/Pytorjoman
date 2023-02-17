@@ -1,6 +1,8 @@
-from typing import Optional
-import httpx
 from dataclasses import dataclass
+from typing import Optional
+
+import httpx
+
 
 async def _call(
     url: str, method: str = "POST", data: dict = {}, params: dict = {}, with_auth: bool = True, token: str=None
