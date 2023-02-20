@@ -103,7 +103,7 @@ class Account(Model):
         status, res = await _call(
             f'{base_url}/api/v1/accounts/',
             data={
-                'frist_name': first_name,
+                'first_name': first_name,
                 'last_name': last_name,
                 'email': email,
                 'username': username,
