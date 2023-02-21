@@ -168,3 +168,30 @@ class Account(Model):
                 raise ValueError("Incorrext values")
             case _:
                 raise UnknownError()
+    
+    @staticmethod
+    async def login_from_token(base_url: str, access_token: str):
+        status, res = await _call(
+            f'{base_url}/api/v1/accounts/',
+            "GET",
+            token=access_token
+        )
+        match status:
+            case 200:
+                return Account(
+                    base_url,
+                    'accounts',
+                    res['tokens']['access'],
+                    res['id'],
+                    res['first_name'],
+                    res['last_name'],
+                    res['email'],
+                    res['username'],
+                    res['send_time'],
+                    res['number_of_words'],
+                    res['tokens']['refresh']
+                )
+            case 401:
+                raise TokenExpiredError()
+            case _:
+                raise UnknownError()
