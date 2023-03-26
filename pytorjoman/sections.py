@@ -80,6 +80,30 @@ class Section(Model):
                 raise TokenExpiredError()
             case _:
                 raise UnknownError()
+            
+        
+    @staticmethod
+    async def get_section(base_url: str, token: str, section: int):
+        status, res = await _call(
+            f'{base_url}/api/v1/sections/{section}',
+            "GET",
+            with_auth=False
+        )
+        match status:
+            case 200:
+                return Section(
+                            base_url,
+                            'projects',
+                            token,
+                            res['id'],
+                            await pytorjoman.Project.get_project(base_url, token, res['project']),
+                            res['name'],
+                            res['created_at']
+                        )
+            case 404:
+                raise NotFoundError("section not found")
+            case _:
+                raise UnknownError()
 
     async def update(self, new_name: str):
         status, res = await self._call(
