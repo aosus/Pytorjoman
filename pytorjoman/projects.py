@@ -97,7 +97,33 @@ class Project(Model):
                 raise TokenExpiredError()
             case _:
                 raise UnknownError()
-
+        
+    @staticmethod
+    async def get_project(base_url: str, token: str, project: int):
+        status, res = await _call(
+            f'{base_url}/api/v1/projects/{project}',
+            "GET",
+            with_auth=False
+        )
+        match status:
+            case 200:
+                return Project(
+                            base_url,
+                            'projects',
+                            token,
+                            res['id'],
+                            Owner(
+                                res['owner']['id'],
+                                res['owner']['first_name']
+                            ),
+                            res['name'],
+                            res['created_at']
+                        )
+            case 404:
+                raise NotFoundError("project not found")
+            case _:
+                raise UnknownError()
+    
     async def update(self, new_name: str):
         status, res = await self._call(
             'update',
@@ -120,7 +146,7 @@ class Project(Model):
                 raise ValueError()
             case _:
                 raise UnknownError()
-            
+    
     
     async def create_section(self, name):
         section = await pytorjoman.Section.create_section(self.base_url, self._access_token, self, name)
