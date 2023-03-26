@@ -112,6 +112,49 @@ class Translation(Model):
                 raise TokenExpiredError()
             case _:
                 raise UnknownError()
+    
+    @staticmethod
+    async def get_translation(base_url: str, token: str, translation: int):
+        status, res = await _call(
+            f'{base_url}/api/v1/translations/{translation}',
+            "GET",
+            with_auth=False
+        )
+        match status:
+            case 200:
+                return Translation(
+                            base_url,
+                            'translations',
+                            token,
+                            res['id'],
+                            Owner(
+                                res['translator']['id'],
+                                res['translator']['first_name']
+                            ) if res.get('translator') else None,
+                            pytorjoman.Sentence(
+                                base_url,
+                                "sentences",
+                                token,
+                                res['sentence']['id'],
+                                await pytorjoman.Section.get_section(base_url, token, res['sentence']['section']),
+                                res['sentence']['sentence'],
+                                res['sentence']['created_at']
+                            ),
+                            res['translation'],
+                            [
+                                Owner(
+                                    v['id'],
+                                    v['first_name']
+                                )
+                                for v in res['voters']
+                            ],
+                            res['is_approved'],
+                            res['created_at']
+                        )
+            case 404:
+                raise NotFoundError("Translation not found")
+            case _:
+                raise UnknownError()
 
     async def get_voters(self):
         status, res = await self._call(
