@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import time
+from typing import Union
 
 import pytorjoman
 from pytorjoman._backend import Model, _call
@@ -98,7 +99,11 @@ class Account(Model):
         )
         return projects
     
-    async def get_sentences_for_user(self, project: int | None = None, section: int | None = None):
+    async def get_sentences_for_user(self, project: Union[int, "pytorjoman.Project", None] = None, section: Union[int, "pytorjoman.Section", None] = None) -> list[
+        dict[str,
+             Union["pytorjoman.Sentence", list[str]]
+            ]
+        ]:
         params = {}
         if section is not None:
             params['section'] = section.id if isinstance(section, pytorjoman.Section) else section
