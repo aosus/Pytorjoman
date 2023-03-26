@@ -98,6 +98,43 @@ class Account(Model):
         )
         return projects
     
+    async def get_sentences_for_user(self, project: int | None = None, section: int | None = None):
+        params = {}
+        if section is not None:
+            params['section'] = section.id if isinstance(section, pytorjoman.Section) else section
+        elif project is not None:
+            params['project'] = project.id if isinstance(project, pytorjoman.Project) else project
+        status, res = await _call(
+            f'{self.base_url}/api/v1/sentences/for-user',
+            "GET",
+            params=params,
+            token=self._access_token,
+        )
+        match status:
+            case 200:
+                return [
+                        {
+                            'sentence': pytorjoman.Sentence(
+                                self.base_url,
+                                'sentences',
+                                self._access_token,
+                                s['id'],
+                                await pytorjoman.Section.get_section(self.base_url, self._access_token, s['section']),
+                                s['sentence'],
+                                s['created_at']
+                            ),
+                            'translations': s['translations'],
+                        }
+                        for s in res
+                    ]
+            case 422:
+                raise ValueError("Invalid section or project, they must be integers")
+            case 401:
+                raise TokenExpiredError()
+            case _:
+                raise UnknownError()
+
+    
     @staticmethod
     async def signup(base_url: str, first_name: str, last_name: str, email: str, username: str, password: str, send_time: time, number_of_words: int):
         status, res = await _call(
