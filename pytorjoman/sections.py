@@ -1,12 +1,15 @@
 from dataclasses import dataclass
-from datetime import datetime, time
-from urllib import parse
+from datetime import datetime
+
 import pytorjoman
-from pytorjoman._backend import Model, ModelList, _call
-from pytorjoman.errors import (AlreadyExistError, IncorrectPasswordError,
-                               NotAllowedError, NotFoundError,
-                               TokenExpiredError, UnknownError,
-                               UnloggedInError)
+from pytorjoman._backend import Model, _call
+from pytorjoman.errors import (
+    AlreadyExistError,
+    NotAllowedError,
+    NotFoundError,
+    TokenExpiredError,
+    UnknownError,
+)
 
 
 @dataclass
@@ -15,31 +18,31 @@ class Section(Model):
     project: pytorjoman.Project
     name: str
     created_at: datetime
-    
+
     @staticmethod
     async def list_sections(base_url: str, token: str, project: pytorjoman.Project):
         status, res = await _call(
-            f'{base_url}/api/v1/sections/',
+            f"{base_url}/api/v1/sections/",
             "GET",
             params={
                 "project": project.id,
             },
-            token=token
+            token=token,
         )
         match status:
             case 200:
                 return [
-                        Section(
-                            base_url,
-                            'projects',
-                            token,
-                            s['id'],
-                            project,
-                            s['name'],
-                            s['created_at']
-                        )
-                        for s in res
-                    ]
+                    Section(
+                        base_url,
+                        "projects",
+                        token,
+                        s["id"],
+                        project,
+                        s["name"],
+                        s["created_at"],
+                    )
+                    for s in res
+                ]
             case 404:
                 raise NotFoundError()
             case 422:
@@ -50,26 +53,28 @@ class Section(Model):
                 raise UnknownError()
 
     @staticmethod
-    async def create_section(base_url: str, token: str, project: pytorjoman.Project, name: str):
+    async def create_section(
+        base_url: str, token: str, project: pytorjoman.Project, name: str
+    ):
         status, res = await _call(
-            f'{base_url}/api/v1/sections/',
+            f"{base_url}/api/v1/sections/",
             data={
                 "name": name,
                 "project_id": project.id,
             },
-            token=token
+            token=token,
         )
         match status:
             case 200:
                 return Section(
-                            base_url,
-                            'projects',
-                            token,
-                            res['id'],
-                            project,
-                            res['name'],
-                            res['created_at']
-                        )
+                    base_url,
+                    "projects",
+                    token,
+                    res["id"],
+                    project,
+                    res["name"],
+                    res["created_at"],
+                )
             case 409:
                 raise AlreadyExistError()
             case 404:
@@ -80,26 +85,25 @@ class Section(Model):
                 raise TokenExpiredError()
             case _:
                 raise UnknownError()
-            
-        
+
     @staticmethod
     async def get_section(base_url: str, token: str, section: int):
         status, res = await _call(
-            f'{base_url}/api/v1/sections/{section}',
-            "GET",
-            with_auth=False
+            f"{base_url}/api/v1/sections/{section}", "GET", with_auth=False
         )
         match status:
             case 200:
                 return Section(
-                            base_url,
-                            'projects',
-                            token,
-                            res['id'],
-                            await pytorjoman.Project.get_project(base_url, token, res['project']),
-                            res['name'],
-                            res['created_at']
-                        )
+                    base_url,
+                    "projects",
+                    token,
+                    res["id"],
+                    await pytorjoman.Project.get_project(
+                        base_url, token, res["project"]
+                    ),
+                    res["name"],
+                    res["created_at"],
+                )
             case 404:
                 raise NotFoundError("section not found")
             case _:
@@ -107,16 +111,11 @@ class Section(Model):
 
     async def update(self, new_name: str):
         status, res = await self._call(
-            'update',
-            "PUT",
-            data={
-                "id": self.id,
-                "new_name": new_name
-            }
+            "update", "PUT", data={"id": self.id, "new_name": new_name}
         )
         match status:
             case 200:
-                self.name = res['name']
+                self.name = res["name"]
             case 404:
                 raise NotFoundError()
             case 401:
@@ -129,15 +128,13 @@ class Section(Model):
                 raise UnknownError()
 
     async def create_sentence(self, sentence):
-        sentence = await pytorjoman.Sentence.create_sentence(self.base_url, self._access_token, self, sentence)
+        sentence = await pytorjoman.Sentence.create_sentence(
+            self.base_url, self._access_token, self, sentence
+        )
         return sentence
-    
-    async def list_sentences(self, page: int = 1, page_size = 25):
+
+    async def list_sentences(self, page: int = 1, page_size=25):
         sentences = await pytorjoman.Sentence.list_sentences(
-            self.base_url,
-            self._access_token,
-            self,
-            page,
-            page_size
+            self.base_url, self._access_token, self, page, page_size
         )
         return sentences

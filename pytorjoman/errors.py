@@ -17,8 +17,10 @@ class UnknownError(Exception):
 class UnloggedInError(Exception):
     pass
 
+
 class TokenExpiredError(Exception):
     pass
+
 
 class NotAllowedError(Exception):
     pass
