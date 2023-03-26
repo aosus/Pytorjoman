@@ -86,6 +86,29 @@ class Sentence(Model):
                 raise TokenExpiredError()
             case _:
                 raise UnknownError()
+            
+    @staticmethod
+    async def get_sentence(base_url: str, token: str, sentence: int):
+        status, res = await _call(
+            f'{base_url}/api/v1/sentences/{sentence}',
+            "GET",
+            with_auth=False
+        )
+        match status:
+            case 200:
+                return Sentence(
+                            base_url,
+                            'projects',
+                            token,
+                            res['id'],
+                            await pytorjoman.Section.get_section(base_url, token, res['section']),
+                            res['name'],
+                            res['created_at']
+                        )
+            case 404:
+                raise NotFoundError("sentence not found")
+            case _:
+                raise UnknownError()
 
     async def update(self, new_sentence: str):
         status, res = await self._call(
@@ -110,7 +133,7 @@ class Sentence(Model):
             case _:
                 raise UnknownError()
     
-    async def create_translation(self, translation):
+    async def create_translation(self, translation: str):
         translation = await pytorjoman.Translation.create_translation(self.base_url, self._access_token, self, translation)
         return translation
     
