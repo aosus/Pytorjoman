@@ -28,7 +28,11 @@ class Project(Model):
 
     @staticmethod
     async def list_project(
-        base_url: str, token: str, user: str = None, page: int = 1, page_size: int = 25
+        base_url: str,
+        token: str,
+        user: str | None = None,
+        page: int = 1,
+        page_size: int = 25,
     ):
         status, res = await _call(
             f"{base_url}/api/v1/projects/",
@@ -44,11 +48,15 @@ class Project(Model):
             case 200:
                 return ModelList(
                     res["count"],
-                    dict(parse.parse_qsl(parse.urlsplit(res["next"]).query)).get(
-                        "page", None
+                    int(
+                        dict(parse.parse_qsl(parse.urlsplit(res["next"]).query)).get(
+                            "page", None
+                        )
                     ),
-                    dict(parse.parse_qsl(parse.urlsplit(res["previous"]).query)).get(
-                        "page", None
+                    int(
+                        dict(
+                            parse.parse_qsl(parse.urlsplit(res["previous"]).query)
+                        ).get("page", None)
                     ),
                     [
                         Project(

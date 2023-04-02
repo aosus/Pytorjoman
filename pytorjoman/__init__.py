@@ -1,3 +1,4 @@
+# ruff: noqa: F401
 from pytorjoman.accounts import Account
 from pytorjoman.projects import Project
 from pytorjoman.sections import Section

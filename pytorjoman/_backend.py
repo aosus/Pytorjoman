@@ -10,7 +10,7 @@ async def _call(
     data: dict = {},
     params: dict = {},
     with_auth: bool = True,
-    token: str = None,
+    token: str | None = None,
 ) -> tuple[int, dict]:
     base = {
         "url": url,

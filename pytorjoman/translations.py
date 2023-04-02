@@ -34,7 +34,8 @@ class Translation(Model):
     ):
         """Get Sentence's translations.
 
-        it doesn't return voters due to API limitations, to get voters please use get_voters function instead
+        it doesn't return voters due to API limitations, to get voters
+        please use get_voters function instead
         """
         status, res = await _call(
             f"{base_url}/api/v1/translations/",
